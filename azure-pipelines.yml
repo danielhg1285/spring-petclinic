@@ -33,15 +33,19 @@ pool:
    vmImage: 'ubuntu-latest'
 
 stages:
-# - stage: CodeChecks
-#   jobs:
-#   - template: jobs/job-code-checks.yml@templates
-
 
 - stage: BuildPushDockerImage
   displayName: Compilado de Imagen Docker
   jobs:
-  - template: jobs/job-build-back.yml@templates
-    parameters:
-      projectFolders:
-        - '.'
+  - job: test
+    steps:
+    - task: Maven@4
+      inputs:
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.11'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        goals: 'package'
