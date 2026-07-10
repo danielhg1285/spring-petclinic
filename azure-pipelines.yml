@@ -1,19 +1,52 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# trigger this pipeline if there's a PR to any of these branches
+pr:
+- develop
+- qa
 
+# trigger this pipeline if there's merge to any of these branches
 trigger:
-- main
+- develop
+- qa
+
+variables:
+  # Common variables
+  - template: variables/variables.yml@templates
+  # Git repository name
+  - name: repoName
+    value: 'spring-petclinic'
+  # Docker project image version.
+  - name: version
+    value: '1.0.0'
+  # Add build ID for unique image tags
+  - name: buildId
+    value: $(Build.BuildId)
+
+resources:
+  repositories:
+  - repository: templates
+    type: git
+    endpoint: danielhg1285
+    name: danielhg1285/pipeline-templates
+    ref: refs/heads/main
 
 pool:
-  vmImage: ubuntu-latest
+   vmImage: 'ubuntu-latest'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+stages:
+# - stage: CodeChecks
+#   jobs:
+#   - template: jobs/job-code-checks.yml@templates
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+
+- stage: BuildPushDockerImage
+  displayName: Compilado de Imagen Docker
+  jobs:
+  - template: jobs/job-build-back.yml@templates
+    parameters:
+      projectFolders:
+        - '.'
+
+  - template: jobs/job-build-docker-image.yml@templates
+    parameters:
+      dependsOn:
+      - BuildBack
