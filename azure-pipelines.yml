@@ -24,7 +24,7 @@ variables:
 resources:
   repositories:
   - repository: templates
-    type: git
+    type: github
     endpoint: danielhg1285
     name: danielhg1285/pipeline-templates
     ref: refs/heads/main
