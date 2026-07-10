@@ -45,8 +45,3 @@ stages:
     parameters:
       projectFolders:
         - '.'
-
-  - template: jobs/job-build-docker-image.yml@templates
-    parameters:
-      dependsOn:
-      - BuildBack
